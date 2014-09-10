@@ -4,11 +4,19 @@ var path = require('path');
 
 var router = require('router')();
 var markdown = require("markdown").markdown;
-var walk    = require('walk');
+var walk = require('walk');
 
 var config = {
 	port: 1080,
 	fileRoot: 'd:/dev/notes'
+};
+
+var beginHtml = function() {
+	return "<!DOCTYPE html>\r\n<html>\r\n<head><title>Simple File Host</title></head>\r\n<body>\r\n"
+};
+
+var endHtml = function() {
+	return "\r\n</body></html>"
 };
 
 router.get('/', function(req, res) {
@@ -29,6 +37,7 @@ router.get('/', function(req, res) {
 
 		res.writeHeader(200, {"Content-Type": "text/html"});
 
+		res.write(beginHtml());
 		res.write("<ul>\r\n");
 
 		files.forEach(function(file) {
@@ -36,6 +45,8 @@ router.get('/', function(req, res) {
 		});
 
 		res.write("</ul>");
+		res.write(endHtml());
+
 		res.end();
 	});
 
@@ -55,7 +66,10 @@ router.get('/files/*', function (req, res) {
 		} else {
 
 			res.writeHeader(200, {"Content-Type": "text/html"});
+
+			res.write(beginHtml());
 			res.write(markdown.toHTML(data.toString()));
+			res.write(endHtml());
 
 		}
 
