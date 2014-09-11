@@ -26,9 +26,12 @@ router.get('/', function(req, res) {
 
 	walker.on('file', function(root, stat, next) {
 
-		var completePath = root + '/' + stat.name;
+		if (path.extname(stat.name) == ".md") {
 
-		files.push(completePath.replace(config.fileRoot, ''));
+			var completePath = root + '/' + stat.name;
+			files.push(completePath.replace(config.fileRoot, ''));
+		}
+
 		next();
 
 	});
@@ -55,6 +58,14 @@ router.get('/', function(req, res) {
 router.get('/files/*', function (req, res) {
 
 	var filePath = path.join(config.fileRoot, req.params.wildcard);
+
+	if (path.extname(filePath) != ".md")
+	{
+		res.writeHeader(404, {"Content-Type": "text/html"});
+		res.write("Cannot find file '" + req.params.wildcard + "'");
+
+		return;
+	}
 
 	fs.readFile(filePath, function(err, data) {
 
